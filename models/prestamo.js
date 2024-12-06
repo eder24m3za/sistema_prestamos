@@ -23,30 +23,41 @@ module.exports = (sequelize, DataTypes) => {
       });
 
       Prestamo.hasMany(models.Payment, {
-        foreignKey: 'prestamo_id',
+        foreignKey: 'prestamo',
         as: 'payments'
       });
     }
   }
   Prestamo.init({
-    monto: { type: 
-      DataTypes.DOUBLE,
+    id_p: {
+      type: DataTypes.INTEGER, // Tipo de dato para la clave primaria
+      primaryKey: true,        // Indicar que es la clave primaria
+      autoIncrement: true      // Si quieres que sea autoincrementable
+    },
+    monto: {
+      type: DataTypes.DOUBLE,
       allowNull: false,
       validate: {
         notNull: {
           msg: 'Por favor, ingrese un monto'
-        }, isDecimal: true
+        },
+        isDecimal: {
+          msg: 'El monto debe ser un número decimal'
+        }
       }
     },
-    fecha_inicio: { type: DataTypes.DATE,
+    fecha_inicio: {
+      type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW
-    }, 
+    },
     fecha_fin: {
       type: DataTypes.DATE,
       allowNull: false,
       validate: {
-        isDate: true 
+        isDate: {
+          msg: 'La fecha de fin debe ser una fecha válida'
+        }
       }
     },
     tasa_interes: {
@@ -55,7 +66,10 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         notNull: {
           msg: 'Por favor, ingrese una tasa de interés'
-        }, isDecimal: true
+        },
+        isDecimal: {
+          msg: 'La tasa de interés debe ser un número decimal'
+        }
       }
     },
     usuario_id: {
@@ -68,13 +82,15 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE'
     },
-    estado: { type: DataTypes.BOOLEAN,
+    estado: {
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true
-     }
+    }
   }, {
     sequelize,
     modelName: 'Prestamo',
+    tableName: 'prestamos'
   });
   return Prestamo;
 };

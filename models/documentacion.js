@@ -17,15 +17,34 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Documentacion.init({
-    descripcion: {
+    id_d: {
+      type: DataTypes.INTEGER, // Tipo de dato para la clave primaria
+      primaryKey: true,        // Indicar que es la clave primaria
+      autoIncrement: true      // Si quieres que sea autoincrementable
+    },
+    tipo: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Por favor, ingrese una descripción'
+        }, len: [
+          2, 250
+        ]
+      }
     }, 
     archivo_url: { 
       type: DataTypes.STRING,
       allowNull: true,
+      validate: {
+        customValidator(value) {
+          const regex = /^http:\/\/localhost:\d+\/files\//;
+          if (value && !regex.test(value)) {
+            throw new Error('Por favor, ingrese una URL válida');
+          }
+        }
+      }
     },
-
     usuario_id: { 
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -51,6 +70,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Documentacion',
+    tableName: 'documentaciones',
   });
   return Documentacion;
 };

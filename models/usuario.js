@@ -1,4 +1,5 @@
 'use strict';
+const bcrypt = require('bcrypt');
 const {
   Model
 } = require('sequelize');
@@ -34,75 +35,106 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Usuario.init({
-    nom: { type: DataTypes.STRING,
+    id_u: {
+      type: DataTypes.INTEGER, // Tipo de dato para la clave primaria
+      primaryKey: true,        // Indicar que es la clave primaria
+      autoIncrement: true      // Si quieres que sea autoincrementable
+    },
+    nom: {
+      type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notNull: {
-          msg: 'Por favor, ingrese su nombre'
-        }, len: [
-          3, 50
-        ]
-      }
+          msg: 'Por favor, ingrese su nombre',
+        },
+        len: {
+          args: [3, 50],
+          msg: 'El nombre debe tener entre 3 y 50 caracteres',
+        },
+      },
     },
 
     correo: {
       type: DataTypes.STRING,
-      allowNull: false, 
-      validate: {
-        isEmail: true, 
-        len: [5, 250], 
-      }
-    },
-
-    contraseña : {
-      type: DataTypes.STRING,
-      allowNull: false, 
+      allowNull: false,
       validate: {
         notNull: {
-          msg: 'Por favor, ingrese una contraseña'
-        }, len: [8, 250]
-      }
+          msg: 'Por favor, ingrese un correo electrónico',
+        },
+        isEmail: {
+          msg: 'Ingrese un correo electrónico válido',
+        },
+        len: {
+          args: [5, 250],
+          msg: 'El correo debe tener entre 5 y 250 caracteres',
+        },
+      },
+    },
+
+    contraseña: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Por favor, ingrese una contraseña',
+        },
+        len: {
+          args: [8],
+          msg: 'La contraseña debe tener al menos 8 caracteres',
+        },
+      },
     },
 
     tel: {
       type: DataTypes.STRING,
-      allowNull: true, 
+      allowNull: true,
       validate: {
-        isNumeric: true, 
-        len: [10, 15], 
-      }
+        isNumeric: {
+          msg: 'El número de teléfono solo debe contener números',
+        },
+        len: {
+          args: [10, 15],
+          msg: 'El número de teléfono debe tener entre 10 y 15 dígitos',
+        },
+      },
     },
-
 
     direccion: {
       type: DataTypes.STRING,
-      allowNull: true, 
+      allowNull: true,
       validate: {
-        len: [5, 250], 
-      }
+        len: {
+          args: [5, 250],
+          msg: 'La dirección debe tener entre 5 y 250 caracteres',
+        },
+      },
     },
 
     fecha_nacimiento: {
       type: DataTypes.DATE,
-      allowNull: true, 
+      allowNull: true,
       validate: {
-        isDate: true, 
-      }
+        isDate: {
+          msg: 'Ingrese una fecha de nacimiento válida',
+        },
+      },
     },
 
     fecha_registro: {
       type: DataTypes.DATE,
-      allowNull: false, 
-      defaultValue: DataTypes.NOW, 
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
       validate: {
-        isDate: true, 
-      }
+        isDate: {
+          msg: 'Ingrese una fecha de registro válida',
+        },
+      },
     },
 
     activo: {
       type: DataTypes.BOOLEAN,
-      allowNull: false, 
-      defaultValue: true, 
+      allowNull: false,
+      defaultValue: true,
     },
 
     rol_id: {
@@ -112,10 +144,24 @@ module.exports = (sequelize, DataTypes) => {
         model: 'Rol', 
         key: 'id_r',
       },
+      validate: {
+        notNull: {
+          msg: 'Por favor, seleccione un rol válido',
+        },
+      },
     }
   }, {
     sequelize,
     modelName: 'Usuario',
+    tableName: 'usuarios',
   });
+
+  Usuario.beforeSave(async (usuario) => {
+    if (usuario.changed('contraseña')) {
+      const salt = await bcrypt.genSalt(10); // Genera el salt
+      usuario.contraseña = await bcrypt.hash(usuario.contraseña, salt); // Hashea la contraseña
+    }
+  });
+
   return Usuario;
 };

@@ -22,16 +22,22 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,        // Indicar que es la clave primaria
       autoIncrement: true      // Si quieres que sea autoincrementable
     },
-    tipo: { type: DataTypes.STRING,
+    tipo: {
+      type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notNull: {
-          msg: 'Por favor, ingrese un tipo de rol'
-        }, len: [
-          5, 250
-        ]
-      }
-    }
+          msg: 'Por favor, ingrese un tipo de rol',
+        },
+        notEmpty: {
+          msg: 'El campo tipo de rol no puede estar vacío',
+        },
+        len: {
+          args: [2, 250],
+          msg: 'El tipo de rol debe tener entre 2 y 250 caracteres',
+        },
+      },
+    }    
   }, {
     sequelize,
     modelName: 'Rol',

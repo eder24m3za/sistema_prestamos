@@ -16,13 +16,18 @@ module.exports = (sequelize, DataTypes) => {
       });
 
       Transaccion.belongsTo(models.Solicitud, {
-        foreignKey: 'solicitud_id',
+        foreignKey: 'solicitud_presta',
         as: 'solicitud'
       });
     }
   }
   Transaccion.init({
-    solicutud_presta: {
+    id_t: {
+      type: DataTypes.INTEGER, // Tipo de dato para la clave primaria
+      primaryKey: true,        // Indicar que es la clave primaria
+      autoIncrement: true      // Si quieres que sea autoincrementable
+    },
+    solicitud_presta: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -79,6 +84,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Transaccion',
+    tableName: 'transacciones'
   });
   return Transaccion;
 };

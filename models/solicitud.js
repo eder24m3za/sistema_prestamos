@@ -26,6 +26,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Solicitud.init({
+    id_s: {
+      type: DataTypes.INTEGER, // Tipo de dato para la clave primaria
+      primaryKey: true,        // Indicar que es la clave primaria
+      autoIncrement: true      // Si quieres que sea autoincrementable
+    },
     descripcion: { type: 
       DataTypes.STRING,
       allowNull: false,
@@ -59,6 +64,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Solicitud',
+    tableName: 'solicitudes',
   });
   return Solicitud;
 };
